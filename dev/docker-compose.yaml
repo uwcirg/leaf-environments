@@ -43,6 +43,7 @@ services:
       - mssql
     volumes:
       - ./gateway/keys:/.keys:ro
+      - ./gateway/appsettings.json:/app/API/appsettings.json:ro
     environment:
       LEAF_JWT_KEY_PW: ${JWT_KEY_PW}
       LEAF_APP_DB: Server=mssql,1433;Database=LeafDB;uid=sa;Password=Th3PA55--8zz
