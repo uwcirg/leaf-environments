@@ -1,3 +1,6 @@
 [submodule "src/leaf"]
 	path = src/leaf
 	url = https://github.com/uwcirg/leaf
+[submodule "src/leaf-scripts"]
+	path = src/leaf-scripts
+	url = https://github.com/uwrit/leaf-scripts/
