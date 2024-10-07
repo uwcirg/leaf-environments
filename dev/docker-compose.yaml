@@ -1,0 +1,78 @@
+version: "3"
+services:
+
+  mssql:
+    image: mcr.microsoft.com/mssql/server:${MSSQL_IMAGE_TAG:-2017-latest}
+    environment:
+      ACCEPT_EULA: "Y"
+      SA_PASSWORD: Th3PA55--8zz
+    volumes:
+      - leaf-mssql:/var/opt/mssql
+      - ./src/db/build/docker-entrypoint.sh:/usr/local/bin/docker-entrypoint.sh:ro
+      - ./src/db/build/configure-db.sh:/usr/local/bin/configure-db.sh:ro
+      - ./src/db/build/setup.sql:/opt/mssql/setup.sql:ro
+
+      - ./src/db/build/LeafDB.Schema.sql:/docker-entrypoint-initdb.d/00LeafDB.Schema.sql:ro
+      - ./src/db/build/LeafDB.Init.sql:/docker-entrypoint-initdb.d/01LeafDB.Init.sql:ro
+      # stored in separate uwrit/leaf-scripts repo, must be present at startup
+      # https://github.com/uwrit/leaf-scripts/blob/master/GEMs/LeafDB.GEMs.sql
+      - ./src/db/build/LeafDB.GEMs.sql:/docker-entrypoint-initdb.d/02LeafDB.GEMs.sql:ro
+
+    entrypoint: /usr/local/bin/docker-entrypoint.sh
+    command: /opt/mssql/bin/sqlservr
+    networks:
+      - internal
+
+  coreapi:
+    image: ghcr.io/uwcirg/leaf-api:${LEAF_API_IMAGE_TAG:-latest}
+    build:
+      context: ./src/server
+    depends_on:
+      - mssql
+    volumes:
+      - ${KEYS:-./src/server/keys}:/.keys
+    environment:
+      LEAF_JWT_KEY_PW: ${JWT_KEY_PW}
+      LEAF_APP_DB: Server=mssql,1433;Database=LeafDB;uid=sa;Password=Th3PA55--8zz
+      LEAF_CLIN_DB: ${CLIN_DB}
+    networks:
+      - internal
+    labels:
+      - traefik.enable=true
+      - traefik.http.routers.coreapi-${COMPOSE_PROJECT_NAME}.rule=Host(`${LEAF_DOMAIN}`) && PathPrefix(`/api`)
+      - traefik.http.routers.coreapi-${COMPOSE_PROJECT_NAME}.entrypoints=websecure
+      - traefik.http.routers.coreapi-${COMPOSE_PROJECT_NAME}.tls=true
+      - traefik.http.routers.coreapi-${COMPOSE_PROJECT_NAME}.tls.certresolver=letsencrypt
+      # Leaf API does not EXPOSE the ports it listens on, requiring explicit traefik configuration
+      - traefik.http.services.coreapi-${COMPOSE_PROJECT_NAME}.loadbalancer.server.port=5001
+    networks:
+      - ingress
+      - internal
+
+  node:
+    image: ghcr.io/uwcirg/leaf-frontend:${LEAF_FRONTEND_IMAGE_TAG:-latest}
+    build:
+      context: ./src/ui-client
+    depends_on:
+      - coreapi
+    labels:
+      - traefik.enable=true
+      - traefik.http.routers.node-${COMPOSE_PROJECT_NAME}.rule=Host(`${LEAF_DOMAIN}`)
+      - traefik.http.routers.node-${COMPOSE_PROJECT_NAME}.entrypoints=websecure
+      - traefik.http.routers.node-${COMPOSE_PROJECT_NAME}.tls=true
+      - traefik.http.routers.node-${COMPOSE_PROJECT_NAME}.tls.certresolver=letsencrypt
+      # Leaf frontend does not EXPOSE the ports it listens on, requiring explicit traefik configuration
+      - traefik.http.services.node-${COMPOSE_PROJECT_NAME}.loadbalancer.server.port=3000
+    networks:
+      - ingress
+
+volumes:
+  leaf-mssql:
+
+networks:
+  # internal network for backing services
+  internal:
+  # ingress network
+  ingress:
+    external: true
+    name: external_web
