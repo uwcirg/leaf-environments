@@ -1,0 +1,1 @@
+-- MariaDB initialization script; run on first start only
