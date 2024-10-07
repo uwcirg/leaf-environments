@@ -26,7 +26,7 @@ services:
     image: mariadb:10.6
     environment:
       MYSQL_ROOT_PASSWORD: cnics@CIRG
-      MYSQL_USER: mysql
+      MYSQL_USER: db-user
       MYSQL_PASSWORD: cnics@CIRG
     volumes:
       - mysql-data:/var/lib/mysql
@@ -46,7 +46,7 @@ services:
     environment:
       LEAF_JWT_KEY_PW: ${GATEWAY_JWT_KEY_PW}
       LEAF_APP_DB: Server=mssql,1433;Database=LeafDB;uid=sa;Password=Th3PA55--8zz
-      LEAF_CLIN_DB: Server=clin-db,3306;Database=gateway;uid=mysql;Password=cnics@CIRG;
+      LEAF_CLIN_DB: Server=clin-db,3306;Database=gateway;uid=db-user;Password=cnics@CIRG;
     networks:
       - internal
     labels:
