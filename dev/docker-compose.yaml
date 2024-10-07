@@ -42,7 +42,7 @@ services:
     depends_on:
       - mssql
     volumes:
-      - ${KEYS:-./src/server/keys}:/.keys
+      - ./gateway/keys:/.keys:ro
     environment:
       LEAF_JWT_KEY_PW: ${JWT_KEY_PW}
       LEAF_APP_DB: Server=mssql,1433;Database=LeafDB;uid=sa;Password=Th3PA55--8zz
