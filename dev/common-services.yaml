@@ -4,7 +4,7 @@ services:
     image: mcr.microsoft.com/mssql/server:${MSSQL_IMAGE_TAG:-2017-latest}
     environment:
       ACCEPT_EULA: "Y"
-      SA_PASSWORD: Th3PA55--8zz
+      SA_PASSWORD: ${MSSQL_SA_PASSWORD}
     volumes:
       - ../src/leaf/src/db/build/docker-entrypoint.sh:/usr/local/bin/docker-entrypoint.sh:ro
       - ../src/leaf/src/db/build/configure-db.sh:/usr/local/bin/configure-db.sh:ro
@@ -23,9 +23,9 @@ services:
   clin-db:
     image: mariadb:10.6
     environment:
-      MYSQL_ROOT_PASSWORD: cnics@CIRG
+      MYSQL_ROOT_PASSWORD: ${MYSQL_ROOT_PASSWORD}
       MYSQL_USER: db-user
-      MYSQL_PASSWORD: cnics@CIRG
+      MYSQL_PASSWORD: ${MYSQL_PASSWORD}
     volumes:
       - mysql-data:/var/lib/mysql
       - ./init-clindb.sql:/docker-entrypoint-initdb.d/init-clindb.sql:ro
