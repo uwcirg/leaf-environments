@@ -12,8 +12,8 @@ services:
       file: ../common-services.yaml
       service: coreapi
     volumes:
-      - ./keys:/.keys:ro
-      - ./appsettings.json:/app/API/appsettings.json:ro
+      - ../gateway/keys:/.keys:ro
+      - ../gateway/appsettings.json:/app/API/appsettings.json:ro
     environment:
       LEAF_JWT_KEY_PW: ${GATEWAY_JWT_KEY_PW}
       LEAF_APP_DB: Server=gateway-mssql,1433;Database=LeafDB;uid=sa;Password=${MSSQL_SA_PASSWORD}
