@@ -1,0 +1,36 @@
+version: "3"
+services:
+  radar-mssql:
+    extends:
+      file: ../common-services.yaml
+      service: mssql
+    volumes:
+      - leaf-radar-mssql:/var/opt/mssql
+
+  radar-coreapi:
+    extends:
+      file: ../common-services.yaml
+      service: coreapi
+    volumes:
+      - ./keys:/.keys:ro
+      - ./appsettings.json:/app/API/appsettings.json:ro
+    environment:
+      LEAF_JWT_KEY_PW: ${RADAR_JWT_KEY_PW}
+      LEAF_APP_DB: Server=radar-mssql,1433;Database=LeafDB;uid=sa;Password=${MSSQL_SA_PASSWORD}
+      LEAF_CLIN_DB: Server=clin-db,3306;Database=radar;uid=db-user;Password=${MYSQL_PASSWORD}
+    labels:
+      - traefik.http.routers.radar-coreapi-${COMPOSE_PROJECT_NAME}.rule=Host(`radar.${LEAF_DOMAIN}`) && PathPrefix(`/api`)
+      - traefik.http.routers.radar-coreapi-${COMPOSE_PROJECT_NAME}.entrypoints=websecure
+      - traefik.http.routers.radar-coreapi-${COMPOSE_PROJECT_NAME}.tls=true
+      - traefik.http.routers.radar-coreapi-${COMPOSE_PROJECT_NAME}.tls.certresolver=letsencrypt
+
+  node:
+    labels:
+      - traefik.enable=true
+      - traefik.http.routers.radar-node-${COMPOSE_PROJECT_NAME}.rule=Host(`radar.${LEAF_DOMAIN}`)
+      - traefik.http.routers.radar-node-${COMPOSE_PROJECT_NAME}.entrypoints=websecure
+      - traefik.http.routers.radar-node-${COMPOSE_PROJECT_NAME}.tls=true
+      - traefik.http.routers.radar-node-${COMPOSE_PROJECT_NAME}.tls.certresolver=letsencrypt
+
+volumes:
+  leaf-radar-mssql:

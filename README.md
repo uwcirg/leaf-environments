@@ -40,7 +40,7 @@ Pull the latest docker images and start all containers
 After 10+ minutes, Leaf should be available at `https://${LEAF_DOMAIN}`, or `https://${SITE}.${LEAF_DOMAIN}`. If any services fail to start, re-run `docker compose up --detach`
 
 ## Loading Clinical Data
-To load a site-specific dataset into its corresponding database, invoke mysql as follows
+To load a site-specific dataset into its corresponding database, invoke mysql as follows (manually replacing ${SITE} with the desired site)
 
     sql_file_path=/srv/www/leaf-scripts/cnics_data.phosphorus.2024.03.14.19.07.reduced.sql
-    docker compose exec -T clin-db mysql --user=db-user --password=cnics@CIRG ${SITE} < $sql_file_path
+    docker compose exec -T clin-db bash -c 'mysql --user=${MYSQL_USER} --password=${MYSQL_PASSWORD} ${SITE}' < $sql_file_path
