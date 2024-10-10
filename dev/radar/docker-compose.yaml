@@ -23,6 +23,8 @@ services:
       - traefik.http.routers.radar-coreapi-${COMPOSE_PROJECT_NAME}.entrypoints=websecure
       - traefik.http.routers.radar-coreapi-${COMPOSE_PROJECT_NAME}.tls=true
       - traefik.http.routers.radar-coreapi-${COMPOSE_PROJECT_NAME}.tls.certresolver=letsencrypt
+      # Leaf API does not EXPOSE the ports it listens on, requiring explicit traefik configuration
+      - traefik.http.services.radar-coreapi-${COMPOSE_PROJECT_NAME}.loadbalancer.server.port=5001
 
   node:
     labels:

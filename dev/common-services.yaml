@@ -40,8 +40,6 @@ services:
       - internal
     labels:
       - traefik.enable=true
-      # Leaf API does not EXPOSE the ports it listens on, requiring explicit traefik configuration
-      - traefik.http.services.coreapi-${COMPOSE_PROJECT_NAME}.loadbalancer.server.port=5001
     networks:
       - ingress
       - internal
@@ -52,7 +50,5 @@ services:
       context: ../src/leaf/src/ui-client
     labels:
       - traefik.enable=true
-      # Leaf frontend does not EXPOSE the ports it listens on, requiring explicit traefik configuration
-      - traefik.http.services.node-${COMPOSE_PROJECT_NAME}.loadbalancer.server.port=3000
     networks:
       - ingress
