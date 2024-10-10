@@ -25,11 +25,19 @@ For each site, generate a JWT signing key. Follow Leaf instructions for [3 - Cre
         -out ${LEAF_CHECKOUT_PATH}/dev/${SITE}/keys/cert.pem \
         -subj "/CN=urn:leaf:issuer:leaf.${INSTITUTION:-cirg}.${TLD:-uw.edu}"
 
+    # load docker compose environment variables into current shell
+    source .env
+
+    JWT_KEY_PW="${SITE^^}_JWT_KEY_PW"
     openssl pkcs12 -export \
         -in ${LEAF_CHECKOUT_PATH}/dev/${SITE}/keys/cert.pem \
         -inkey ${LEAF_CHECKOUT_PATH}/dev/${SITE}/keys/key.pem \
         -out ${LEAF_CHECKOUT_PATH}/dev/${SITE}/keys/leaf.pfx \
-        -password pass:${JWT_KEY_PW:-cirg-leaf}
+        -password pass:${!JWT_KEY_PW}
+
+Keys need to be readable by the API container. To make all keys readable, run the command below
+
+    chmod -R o+r ${LEAF_CHECKOUT_PATH}/dev/*/keys
 
 ## Deploy
 Pull the latest docker images and start all containers
