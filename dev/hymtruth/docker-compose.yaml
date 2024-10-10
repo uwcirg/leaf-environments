@@ -1,0 +1,38 @@
+version: "3"
+services:
+  hymtruth-mssql:
+    extends:
+      file: ../common-services.yaml
+      service: mssql
+    volumes:
+      - leaf-hymtruth-mssql:/var/opt/mssql
+
+  hymtruth-coreapi:
+    extends:
+      file: ../common-services.yaml
+      service: coreapi
+    volumes:
+      - ../hymtruth/keys:/.keys:ro
+      - ../hymtruth/appsettings.json:/app/API/appsettings.json:ro
+    environment:
+      LEAF_JWT_KEY_PW: ${hymtruth_JWT_KEY_PW}
+      LEAF_APP_DB: Server=hymtruth-mssql,1433;Database=LeafDB;uid=sa;Password=${MSSQL_SA_PASSWORD}
+      LEAF_CLIN_DB: Server=clin-db,3306;Database=hymtruth;uid=db-user;Password=${MYSQL_PASSWORD}
+    labels:
+      - traefik.http.routers.hymtruth-coreapi-${COMPOSE_PROJECT_NAME}.rule=Host(`hymtruth.${LEAF_DOMAIN}`) && PathPrefix(`/api`)
+      - traefik.http.routers.hymtruth-coreapi-${COMPOSE_PROJECT_NAME}.entrypoints=websecure
+      - traefik.http.routers.hymtruth-coreapi-${COMPOSE_PROJECT_NAME}.tls=true
+      - traefik.http.routers.hymtruth-coreapi-${COMPOSE_PROJECT_NAME}.tls.certresolver=letsencrypt
+      # Leaf API does not EXPOSE the ports it listens on, requiring explicit traefik configuration
+      - traefik.http.services.hymtruth-coreapi-${COMPOSE_PROJECT_NAME}.loadbalancer.server.port=5001
+
+  node:
+    labels:
+      - traefik.enable=true
+      - traefik.http.routers.hymtruth-node-${COMPOSE_PROJECT_NAME}.rule=Host(`hymtruth.${LEAF_DOMAIN}`)
+      - traefik.http.routers.hymtruth-node-${COMPOSE_PROJECT_NAME}.entrypoints=websecure
+      - traefik.http.routers.hymtruth-node-${COMPOSE_PROJECT_NAME}.tls=true
+      - traefik.http.routers.hymtruth-node-${COMPOSE_PROJECT_NAME}.tls.certresolver=letsencrypt
+
+volumes:
+  leaf-hymtruth-mssql:
