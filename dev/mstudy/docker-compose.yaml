@@ -15,7 +15,7 @@ services:
       - ../mstudy/keys:/.keys:ro
       - ../mstudy/appsettings.json:/app/API/appsettings.json:ro
     environment:
-      LEAF_JWT_KEY_PW: ${mstudy_JWT_KEY_PW}
+      LEAF_JWT_KEY_PW: ${MSTUDY_JWT_KEY_PW}
       LEAF_APP_DB: Server=mstudy-mssql,1433;Database=LeafDB;uid=sa;Password=${MSSQL_SA_PASSWORD}
       LEAF_CLIN_DB: Server=clin-db,3306;Database=mstudy;uid=db-user;Password=${MYSQL_PASSWORD}
     labels:

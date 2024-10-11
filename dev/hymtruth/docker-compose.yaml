@@ -15,7 +15,7 @@ services:
       - ../hymtruth/keys:/.keys:ro
       - ../hymtruth/appsettings.json:/app/API/appsettings.json:ro
     environment:
-      LEAF_JWT_KEY_PW: ${hymtruth_JWT_KEY_PW}
+      LEAF_JWT_KEY_PW: ${HYMTRUTH_JWT_KEY_PW}
       LEAF_APP_DB: Server=hymtruth-mssql,1433;Database=LeafDB;uid=sa;Password=${MSSQL_SA_PASSWORD}
       LEAF_CLIN_DB: Server=clin-db,3306;Database=hymtruth;uid=db-user;Password=${MYSQL_PASSWORD}
     labels:
