@@ -1,0 +1,38 @@
+version: "3"
+services:
+  mstudy-mssql:
+    extends:
+      file: ../common-services.yaml
+      service: mssql
+    volumes:
+      - leaf-mstudy-mssql:/var/opt/mssql
+
+  mstudy-coreapi:
+    extends:
+      file: ../common-services.yaml
+      service: coreapi
+    volumes:
+      - ../mstudy/keys:/.keys:ro
+      - ../mstudy/appsettings.json:/app/API/appsettings.json:ro
+    environment:
+      LEAF_JWT_KEY_PW: ${MSTUDY_JWT_KEY_PW}
+      LEAF_APP_DB: Server=mstudy-mssql,1433;Database=LeafDB;uid=sa;Password=${MSSQL_SA_PASSWORD}
+      LEAF_CLIN_DB: Server=clin-db,3306;Database=mstudy;uid=db-user;Password=${MYSQL_PASSWORD}
+    labels:
+      - traefik.http.routers.mstudy-coreapi-${COMPOSE_PROJECT_NAME}.rule=Host(`mstudy.${LEAF_DOMAIN}`) && PathPrefix(`/api`)
+      - traefik.http.routers.mstudy-coreapi-${COMPOSE_PROJECT_NAME}.entrypoints=websecure
+      - traefik.http.routers.mstudy-coreapi-${COMPOSE_PROJECT_NAME}.tls=true
+      - traefik.http.routers.mstudy-coreapi-${COMPOSE_PROJECT_NAME}.tls.certresolver=letsencrypt
+      # Leaf API does not EXPOSE the ports it listens on, requiring explicit traefik configuration
+      - traefik.http.services.mstudy-coreapi-${COMPOSE_PROJECT_NAME}.loadbalancer.server.port=5001
+
+  node:
+    labels:
+      - traefik.enable=true
+      - traefik.http.routers.mstudy-node-${COMPOSE_PROJECT_NAME}.rule=Host(`mstudy.${LEAF_DOMAIN}`)
+      - traefik.http.routers.mstudy-node-${COMPOSE_PROJECT_NAME}.entrypoints=websecure
+      - traefik.http.routers.mstudy-node-${COMPOSE_PROJECT_NAME}.tls=true
+      - traefik.http.routers.mstudy-node-${COMPOSE_PROJECT_NAME}.tls.certresolver=letsencrypt
+
+volumes:
+  leaf-mstudy-mssql:

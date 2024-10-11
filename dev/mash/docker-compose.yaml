@@ -1,0 +1,38 @@
+version: "3"
+services:
+  mash-mssql:
+    extends:
+      file: ../common-services.yaml
+      service: mssql
+    volumes:
+      - leaf-mash-mssql:/var/opt/mssql
+
+  mash-coreapi:
+    extends:
+      file: ../common-services.yaml
+      service: coreapi
+    volumes:
+      - ../mash/keys:/.keys:ro
+      - ../mash/appsettings.json:/app/API/appsettings.json:ro
+    environment:
+      LEAF_JWT_KEY_PW: ${MASH_JWT_KEY_PW}
+      LEAF_APP_DB: Server=mash-mssql,1433;Database=LeafDB;uid=sa;Password=${MSSQL_SA_PASSWORD}
+      LEAF_CLIN_DB: Server=clin-db,3306;Database=mash;uid=db-user;Password=${MYSQL_PASSWORD}
+    labels:
+      - traefik.http.routers.mash-coreapi-${COMPOSE_PROJECT_NAME}.rule=Host(`mash.${LEAF_DOMAIN}`) && PathPrefix(`/api`)
+      - traefik.http.routers.mash-coreapi-${COMPOSE_PROJECT_NAME}.entrypoints=websecure
+      - traefik.http.routers.mash-coreapi-${COMPOSE_PROJECT_NAME}.tls=true
+      - traefik.http.routers.mash-coreapi-${COMPOSE_PROJECT_NAME}.tls.certresolver=letsencrypt
+      # Leaf API does not EXPOSE the ports it listens on, requiring explicit traefik configuration
+      - traefik.http.services.mash-coreapi-${COMPOSE_PROJECT_NAME}.loadbalancer.server.port=5001
+
+  node:
+    labels:
+      - traefik.enable=true
+      - traefik.http.routers.mash-node-${COMPOSE_PROJECT_NAME}.rule=Host(`mash.${LEAF_DOMAIN}`)
+      - traefik.http.routers.mash-node-${COMPOSE_PROJECT_NAME}.entrypoints=websecure
+      - traefik.http.routers.mash-node-${COMPOSE_PROJECT_NAME}.tls=true
+      - traefik.http.routers.mash-node-${COMPOSE_PROJECT_NAME}.tls.certresolver=letsencrypt
+
+volumes:
+  leaf-mash-mssql:
