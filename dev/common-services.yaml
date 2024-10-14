@@ -36,8 +36,6 @@ services:
     image: ghcr.io/uwcirg/leaf-api:${LEAF_API_IMAGE_TAG:-latest}
     build:
       context: ../src/leaf/src/server
-    networks:
-      - internal
     labels:
       - traefik.enable=true
     networks:
