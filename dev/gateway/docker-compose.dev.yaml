@@ -1,0 +1,8 @@
+version: "3"
+services:
+  node:
+    volumes:
+      # TODO move node_modules outside src/ directory
+      # do not mount entire src/ directory, so node_modules still exists
+      - ../../src/leaf/src/ui-client/src:/app/src
+      - ../../src/leaf/src/ui-client/public:/app/public
