@@ -24,8 +24,6 @@ services:
       - traefik.http.routers.gateway-coreapi-${COMPOSE_PROJECT_NAME}.tls=true
       - traefik.http.routers.gateway-coreapi-${COMPOSE_PROJECT_NAME}.tls.certresolver=letsencrypt
 
-      # Leaf API does not EXPOSE the ports it listens on, requiring explicit traefik configuration
-      - traefik.http.services.gateway-coreapi-${COMPOSE_PROJECT_NAME}.loadbalancer.server.port=5001
   node:
     extends:
       file: ../common-services.yaml
@@ -37,8 +35,6 @@ services:
       - traefik.http.routers.gateway-node-${COMPOSE_PROJECT_NAME}.tls=true
       - traefik.http.routers.gateway-node-${COMPOSE_PROJECT_NAME}.tls.certresolver=letsencrypt
 
-      # Leaf frontend does not EXPOSE the ports it listens on, requiring explicit traefik configuration
-      - traefik.http.services.gateway-node-${COMPOSE_PROJECT_NAME}.loadbalancer.server.port=3000
   clin-db:
     extends:
       file: ../common-services.yaml
