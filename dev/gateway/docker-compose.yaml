@@ -24,6 +24,9 @@ services:
       - traefik.http.routers.gateway-coreapi-${COMPOSE_PROJECT_NAME}.tls=true
       - traefik.http.routers.gateway-coreapi-${COMPOSE_PROJECT_NAME}.tls.certresolver=letsencrypt
 
+      # TODO remove after auth implemented via oauth2-proxy
+      # only allow access from localhost and CIRG IP ranges
+      - traefik.http.routers.gateway-coreapi-${COMPOSE_PROJECT_NAME}.middlewares=limit-access-to-cirg-dc-cidr
   node:
     extends:
       file: ../common-services.yaml
@@ -35,6 +38,9 @@ services:
       - traefik.http.routers.gateway-node-${COMPOSE_PROJECT_NAME}.tls=true
       - traefik.http.routers.gateway-node-${COMPOSE_PROJECT_NAME}.tls.certresolver=letsencrypt
 
+      # TODO remove after auth implemented via oauth2-proxy
+      # only allow access from localhost and CIRG IP ranges
+      - traefik.http.routers.gateway-node-${COMPOSE_PROJECT_NAME}.middlewares=limit-access-to-cirg-dc-cidr
   clin-db:
     extends:
       file: ../common-services.yaml
