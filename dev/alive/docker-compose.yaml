@@ -17,7 +17,7 @@ services:
     environment:
       LEAF_JWT_KEY_PW: ${ALIVE_JWT_KEY_PW}
       LEAF_APP_DB: Server=alive-mssql,1433;Database=LeafDB;uid=sa;Password=${MSSQL_SA_PASSWORD}
-      LEAF_CLIN_DB: Server=clin-db,3306;Database=alive;uid=db-user;Password=${MYSQL_PASSWORD}
+      LEAF_CLIN_DB: Server=clin-db,3306;Database=alive;uid=db-user;Password=${MYSQL_PASSWORD};Pooling=false
     labels:
       - traefik.http.routers.alive-coreapi-${COMPOSE_PROJECT_NAME}.rule=Host(`alive.${LEAF_DOMAIN}`) && PathPrefix(`/api`)
       - traefik.http.routers.alive-coreapi-${COMPOSE_PROJECT_NAME}.entrypoints=websecure
