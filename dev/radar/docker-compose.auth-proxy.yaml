@@ -60,6 +60,13 @@ services:
       - traefik.http.middlewares.oidc-auth-${COMPOSE_PROJECT_NAME}.forwardAuth.address=http://auth-proxy-${COMPOSE_PROJECT_NAME}:4180/
       - traefik.http.middlewares.oidc-auth-${COMPOSE_PROJECT_NAME}.forwardAuth.trustForwardHeader=true
       - traefik.http.middlewares.oidc-auth-${COMPOSE_PROJECT_NAME}.forwardAuth.authResponseHeaders=X-Auth-Request-User,X-Auth-Request-Email,X-Auth-Request-Access-Token,Authorization
+
+
+      # add Leaf group to all users via header
+      #- traefik.http.middlewares.leaf-groups-${COMPOSE_PROJECT_NAME}.headers.customrequestheaders.gws-groups=uw_leaf_users
+      #- traefik.http.middlewares.leaf-groups-${COMPOSE_PROJECT_NAME}.headers.customrequestheaders.gws-groups=uw_leaf_identified
+      - traefik.http.middlewares.leaf-groups-${COMPOSE_PROJECT_NAME}.headers.customrequestheaders.gws-groups=uw_leaf_admins
+
     networks:
       ingress:
         aliases:
@@ -70,7 +77,7 @@ services:
     labels:
       - traefik.enable=true
       - traefik.http.routers.leaf-auth-frontend-${COMPOSE_PROJECT_NAME}.rule=Host(`leaf-auth.radar.leaf-envs.fl.ivanc.dev.cirg.uw.edu`) && !PathPrefix(`/api`)
-      - traefik.http.routers.leaf-auth-frontend-${COMPOSE_PROJECT_NAME}.middlewares=oidc-auth-${COMPOSE_PROJECT_NAME}
+      - traefik.http.routers.leaf-auth-frontend-${COMPOSE_PROJECT_NAME}.middlewares=oidc-auth-${COMPOSE_PROJECT_NAME},leaf-groups-${COMPOSE_PROJECT_NAME}
       - traefik.http.routers.leaf-auth-frontend-${COMPOSE_PROJECT_NAME}.entrypoints=websecure
       - traefik.http.routers.leaf-auth-frontend-${COMPOSE_PROJECT_NAME}.tls=true
       - traefik.http.routers.leaf-auth-frontend-${COMPOSE_PROJECT_NAME}.tls.certresolver=letsencrypt
@@ -81,7 +88,7 @@ services:
     labels:
       - traefik.enable=true
       - traefik.http.routers.leaf-auth-api-${COMPOSE_PROJECT_NAME}.rule=Host(`leaf-auth.radar.leaf-envs.fl.ivanc.dev.cirg.uw.edu`) && PathPrefix(`/api`)
-      - traefik.http.routers.leaf-auth-api-${COMPOSE_PROJECT_NAME}.middlewares=oidc-auth-${COMPOSE_PROJECT_NAME}
+      - traefik.http.routers.leaf-auth-api-${COMPOSE_PROJECT_NAME}.middlewares=oidc-auth-${COMPOSE_PROJECT_NAME},leaf-groups-${COMPOSE_PROJECT_NAME}
       - traefik.http.routers.leaf-auth-api-${COMPOSE_PROJECT_NAME}.entrypoints=websecure
       - traefik.http.routers.leaf-auth-api-${COMPOSE_PROJECT_NAME}.tls=true
       - traefik.http.routers.leaf-auth-api-${COMPOSE_PROJECT_NAME}.tls.certresolver=letsencrypt
@@ -94,7 +101,7 @@ services:
     labels:
       - traefik.enable=true
       - traefik.http.routers.leaf-auth-whoami-${COMPOSE_PROJECT_NAME}.rule=Host(`whoami.radar.leaf-envs.fl.ivanc.dev.cirg.uw.edu`)
-      - traefik.http.routers.leaf-auth-whoami-${COMPOSE_PROJECT_NAME}.middlewares=oidc-auth-${COMPOSE_PROJECT_NAME}
+      - traefik.http.routers.leaf-auth-whoami-${COMPOSE_PROJECT_NAME}.middlewares=oidc-auth-${COMPOSE_PROJECT_NAME},leaf-groups-${COMPOSE_PROJECT_NAME}
       - traefik.http.routers.leaf-auth-whoami-${COMPOSE_PROJECT_NAME}.entrypoints=websecure
       - traefik.http.routers.leaf-auth-whoami-${COMPOSE_PROJECT_NAME}.tls=true
       - traefik.http.routers.leaf-auth-whoami-${COMPOSE_PROJECT_NAME}.tls.certresolver=letsencrypt
