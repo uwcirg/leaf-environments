@@ -23,9 +23,6 @@ services:
       - traefik.http.routers.mstudy-coreapi-${COMPOSE_PROJECT_NAME}.entrypoints=websecure
       - traefik.http.routers.mstudy-coreapi-${COMPOSE_PROJECT_NAME}.tls.certresolver=letsencrypt
 
-      # TODO remove after auth implemented via oauth2-proxy
-      # only allow access from localhost and CIRG IP ranges
-      - traefik.http.routers.mstudy-coreapi-${COMPOSE_PROJECT_NAME}.middlewares=limit-access-to-cirg-dc-cidr
   node:
     labels:
       - traefik.enable=true
@@ -33,8 +30,5 @@ services:
       - traefik.http.routers.mstudy-node-${COMPOSE_PROJECT_NAME}.entrypoints=websecure
       - traefik.http.routers.mstudy-node-${COMPOSE_PROJECT_NAME}.tls.certresolver=letsencrypt
 
-      # TODO remove after auth implemented via oauth2-proxy
-      # only allow access from localhost and CIRG IP ranges
-      - traefik.http.routers.mstudy-node-${COMPOSE_PROJECT_NAME}.middlewares=limit-access-to-cirg-dc-cidr
 volumes:
   leaf-mstudy-mssql:
