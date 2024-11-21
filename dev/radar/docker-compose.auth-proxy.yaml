@@ -5,7 +5,6 @@ services:
     expose:
       - 4180
     environment:
-      # service settings
       # OAUTH2_PROXY_CLIENT_ID: leaf_prod_oauth2_proxy
       OAUTH2_PROXY_CLIENT_ID: 'urn:leaf:iss:dev.leaf.tld'
 
@@ -28,6 +27,7 @@ services:
       OAUTH2_PROXY_COOKIE_EXPIRE: 30m
       OAUTH2_PROXY_COOKIE_REFRESH: 1m
       OAUTH2_PROXY_INSECURE_OIDC_ALLOW_UNVERIFIED_EMAIL: "true"
+      # TODO test how leaf handles usernames that are not email addresses
       # base session cookie on Keycloak username (email not always set in Keycloak)
       OAUTH2_PROXY_USER_ID_CLAIM: preferred_username
 
