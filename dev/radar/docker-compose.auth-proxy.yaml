@@ -5,18 +5,13 @@ services:
     expose:
       - 4180
     environment:
+      OAUTH2_PROXY_HTTP_ADDRESS: 0.0.0.0:4180
       # OAUTH2_PROXY_CLIENT_ID: leaf_prod_oauth2_proxy
       OAUTH2_PROXY_CLIENT_ID: 'urn:leaf:iss:dev.leaf.tld'
 
-      OAUTH2_PROXY_HTTP_ADDRESS: 0.0.0.0:4180
       OAUTH2_PROXY_REVERSE_PROXY: "true"
       # needed to set X-Auth-Request-Email
       OAUTH2_PROXY_SET_XAUTHREQUEST: "true"
-      OAUTH2_PROXY_PASS_USER_HEADERS: "true"
-      OAUTH2_PROXY_INSECURE_OIDC_SKIP_ISSUER_VERIFICATION: "true"
-      # allow validation of JWTs in Authorization HTTP header
-      # https://medium.com/in-the-weeds/service-to-service-authentication-on-kubernetes-94dcb8216cdc#20d0
-      OAUTH2_PROXY_SKIP_JWT_BEARER_TOKENS: "true"
 
       # when authenticated, return a static 202 response
       # https://oauth2-proxy.github.io/oauth2-proxy/docs/configuration/overview/#forwardauth-with-static-upstreams-configuration
