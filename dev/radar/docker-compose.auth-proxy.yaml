@@ -1,6 +1,9 @@
 services:
   auth-proxy:
     image: quay.io/oauth2-proxy/oauth2-proxy:v7.3.0
+    # oauth2-proxy does not EXPOSE (advertise) the ports it listens on in its docker image
+    expose:
+      - 4180
     environment:
       # service settings
       # OAUTH2_PROXY_CLIENT_ID: leaf_prod_oauth2_proxy
@@ -45,9 +48,6 @@ services:
       - traefik.http.routers.auth-proxy-${COMPOSE_PROJECT_NAME}.entrypoints=websecure
       - traefik.http.routers.auth-proxy-${COMPOSE_PROJECT_NAME}.tls=true
       - traefik.http.routers.auth-proxy-${COMPOSE_PROJECT_NAME}.tls.certresolver=letsencrypt
-
-      # oauth2-proxy does not EXPOSE the ports it listens on, requiring explicit traefik configuration
-      - traefik.http.services.auth-proxy-${COMPOSE_PROJECT_NAME}.loadbalancer.server.port=4180
 
       # https://oauth2-proxy.github.io/oauth2-proxy/configuration/integration/#forwardauth-with-static-upstreams-configuration
       - traefik.http.middlewares.oidc-auth-${COMPOSE_PROJECT_NAME}.forwardAuth.address=http://auth-proxy-${COMPOSE_PROJECT_NAME}:4180/
