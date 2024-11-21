@@ -34,18 +34,18 @@ services:
       OAUTH2_PROXY_OIDC_ISSUER_URL: https://keycloak.cirg.washington.edu/realms/hivsuccess-upload
 
       # security settings
-      OAUTH2_PROXY_COOKIE_DOMAINS: .${BASE_DOMAIN}
-      OAUTH2_PROXY_WHITELIST_DOMAINS: .${BASE_DOMAIN}
+      OAUTH2_PROXY_COOKIE_DOMAINS: .${LEAF_DOMAIN}
+      OAUTH2_PROXY_WHITELIST_DOMAINS: .${LEAF_DOMAIN}
     # TODO fixup relative path
     env_file:
       - ../radar/auth-proxy.env
     labels:
       - traefik.enable=true
       # TODO fine-tune to catch any requests coming from this docker-compose project
-      - traefik.http.routers.auth-proxy-${COMPOSE_PROJECT_NAME}.rule=Host(`auth-proxy.${BASE_DOMAIN}`) || (Host(`leaf-auth.radar.${LEAF_DOMAIN}`) && PathPrefix(`/oauth2`))
-      #- traefik.http.routers.auth-proxy-${COMPOSE_PROJECT_NAME}.rule=Host(`auth-proxy.${BASE_DOMAIN}`) || (Host(`whoami.radar.${LEAF_DOMAIN}`) && PathPrefix(`/oauth2`))
+      - traefik.http.routers.auth-proxy-${COMPOSE_PROJECT_NAME}.rule=Host(`auth-proxy.${LEAF_DOMAIN}`) || (Host(`leaf-auth.radar.${LEAF_DOMAIN}`) && PathPrefix(`/oauth2`))
+      #- traefik.http.routers.auth-proxy-${COMPOSE_PROJECT_NAME}.rule=Host(`auth-proxy.${LEAF_DOMAIN}`) || (Host(`whoami.radar.${LEAF_DOMAIN}`) && PathPrefix(`/oauth2`))
 
-      #- traefik.http.routers.auth-proxy-${COMPOSE_PROJECT_NAME}.rule=Host(`auth-proxy.${BASE_DOMAIN}`) || (Host(`whoami.radar.${LEAF_DOMAIN}`) && PathPrefix(`/oauth2`))
+      #- traefik.http.routers.auth-proxy-${COMPOSE_PROJECT_NAME}.rule=Host(`auth-proxy.${LEAF_DOMAIN}`) || (Host(`whoami.radar.${LEAF_DOMAIN}`) && PathPrefix(`/oauth2`))
       - traefik.http.routers.auth-proxy-${COMPOSE_PROJECT_NAME}.entrypoints=websecure
       - traefik.http.routers.auth-proxy-${COMPOSE_PROJECT_NAME}.tls=true
       - traefik.http.routers.auth-proxy-${COMPOSE_PROJECT_NAME}.tls.certresolver=letsencrypt
