@@ -41,11 +41,7 @@ services:
       - ../radar/auth-proxy.env
     labels:
       - traefik.enable=true
-      # TODO fine-tune to catch any requests coming from this docker-compose project
-      - traefik.http.routers.auth-proxy-${COMPOSE_PROJECT_NAME}.rule=Host(`auth-proxy.${LEAF_DOMAIN}`) || (Host(`leaf-auth.radar.${LEAF_DOMAIN}`) && PathPrefix(`/oauth2`))
-      #- traefik.http.routers.auth-proxy-${COMPOSE_PROJECT_NAME}.rule=Host(`auth-proxy.${LEAF_DOMAIN}`) || (Host(`whoami.radar.${LEAF_DOMAIN}`) && PathPrefix(`/oauth2`))
-
-      #- traefik.http.routers.auth-proxy-${COMPOSE_PROJECT_NAME}.rule=Host(`auth-proxy.${LEAF_DOMAIN}`) || (Host(`whoami.radar.${LEAF_DOMAIN}`) && PathPrefix(`/oauth2`))
+      - traefik.http.routers.auth-proxy-${COMPOSE_PROJECT_NAME}.rule=PathPrefix(`/oauth2`) && (Host(`auth-proxy.${LEAF_DOMAIN}`) || (Host(`leaf-auth.radar.${LEAF_DOMAIN}`)))
       - traefik.http.routers.auth-proxy-${COMPOSE_PROJECT_NAME}.entrypoints=websecure
       - traefik.http.routers.auth-proxy-${COMPOSE_PROJECT_NAME}.tls=true
       - traefik.http.routers.auth-proxy-${COMPOSE_PROJECT_NAME}.tls.certresolver=letsencrypt
@@ -53,12 +49,10 @@ services:
       # oauth2-proxy does not EXPOSE the ports it listens on, requiring explicit traefik configuration
       - traefik.http.services.auth-proxy-${COMPOSE_PROJECT_NAME}.loadbalancer.server.port=4180
 
-
       # https://oauth2-proxy.github.io/oauth2-proxy/configuration/integration/#forwardauth-with-static-upstreams-configuration
       - traefik.http.middlewares.oidc-auth-${COMPOSE_PROJECT_NAME}.forwardAuth.address=http://auth-proxy-${COMPOSE_PROJECT_NAME}:4180/
       - traefik.http.middlewares.oidc-auth-${COMPOSE_PROJECT_NAME}.forwardAuth.trustForwardHeader=true
       - traefik.http.middlewares.oidc-auth-${COMPOSE_PROJECT_NAME}.forwardAuth.authResponseHeaders=X-Auth-Request-User,X-Auth-Request-Email,X-Auth-Request-Access-Token,Authorization
-
 
       # add Leaf group to all users via header
       #- traefik.http.middlewares.leaf-groups-${COMPOSE_PROJECT_NAME}.headers.customrequestheaders.gws-groups=uw_leaf_users
