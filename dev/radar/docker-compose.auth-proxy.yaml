@@ -85,13 +85,13 @@ services:
   radar-coreapi:
     labels:
       - traefik.enable=true
-      - traefik.http.routers.leaf-unauth-api-${COMPOSE_PROJECT_NAME}.rule=Host(`leaf-auth.radar.leaf-envs.fl.ivanc.dev.cirg.uw.edu`) && (PathPrefix(`/api`) || PathPrefix(`/api/user/attest`))
+      - traefik.http.routers.leaf-unauth-api-${COMPOSE_PROJECT_NAME}.rule=Host(`leaf-auth.radar.leaf-envs.fl.ivanc.dev.cirg.uw.edu`) && (PathPrefix(`/api`) || PathPrefix(`/api/user/attest`)) && !Path(`/api/user`)
       - traefik.http.routers.leaf-unauth-api-${COMPOSE_PROJECT_NAME}.middlewares=leaf-groups-${COMPOSE_PROJECT_NAME}
       - traefik.http.routers.leaf-unauth-api-${COMPOSE_PROJECT_NAME}.entrypoints=websecure
       - traefik.http.routers.leaf-unauth-api-${COMPOSE_PROJECT_NAME}.tls=true
       - traefik.http.routers.leaf-unauth-api-${COMPOSE_PROJECT_NAME}.tls.certresolver=letsencrypt
 
-      - traefik.http.routers.leaf-auth-api-${COMPOSE_PROJECT_NAME}.rule=Host(`leaf-auth.radar.leaf-envs.fl.ivanc.dev.cirg.uw.edu`) && PathPrefix(`/api/user`)
+      - traefik.http.routers.leaf-auth-api-${COMPOSE_PROJECT_NAME}.rule=Host(`leaf-auth.radar.leaf-envs.fl.ivanc.dev.cirg.uw.edu`) && Path(`/api/user`)
       - traefik.http.routers.leaf-auth-api-${COMPOSE_PROJECT_NAME}.middlewares=oidc-auth-${COMPOSE_PROJECT_NAME},leaf-groups-${COMPOSE_PROJECT_NAME}
       - traefik.http.routers.leaf-auth-api-${COMPOSE_PROJECT_NAME}.entrypoints=websecure
       - traefik.http.routers.leaf-auth-api-${COMPOSE_PROJECT_NAME}.tls=true
