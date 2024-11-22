@@ -34,13 +34,10 @@ services:
       # security settings
       OAUTH2_PROXY_COOKIE_DOMAINS: .${LEAF_DOMAIN}
       OAUTH2_PROXY_WHITELIST_DOMAINS: .${LEAF_DOMAIN}
-    # TODO fixup relative path
-    env_file:
-      - ../gateway/auth-proxy.env
     labels:
       - traefik.enable=true
       # TODO try using ${LEAF_DOMAIN} as string literal in HostRegexp; dots in domain break regex
-      - traefik.http.routers.auth-proxy-${COMPOSE_PROJECT_NAME}.rule=PathPrefix(`/oauth2`) && (Host(`auth-proxy.${LEAF_DOMAIN}`) || Host(`${LEAF_DOMAIN}`) || (Host(`alive.${LEAF_DOMAIN}`)))
+      - traefik.http.routers.auth-proxy-${COMPOSE_PROJECT_NAME}.rule=PathPrefix(`/oauth2`) && (Host(`auth-proxy.${LEAF_DOMAIN}`) || Host(`${LEAF_DOMAIN}`) || (Host(`radar.${LEAF_DOMAIN}`)))
       - traefik.http.routers.auth-proxy-${COMPOSE_PROJECT_NAME}.entrypoints=websecure
       - traefik.http.routers.auth-proxy-${COMPOSE_PROJECT_NAME}.tls=true
       - traefik.http.routers.auth-proxy-${COMPOSE_PROJECT_NAME}.tls.certresolver=letsencrypt
