@@ -39,7 +39,6 @@ services:
       # TODO try using ${LEAF_DOMAIN} as string literal in HostRegexp; dots in domain break regex
       - traefik.http.routers.auth-proxy-${COMPOSE_PROJECT_NAME}.rule=Host(`auth-proxy.${LEAF_DOMAIN}`) || (PathPrefix(`/oauth2`) && (Host(`${LEAF_DOMAIN}`) || Host(`radar.${LEAF_DOMAIN}`)))
       - traefik.http.routers.auth-proxy-${COMPOSE_PROJECT_NAME}.entrypoints=websecure
-      - traefik.http.routers.auth-proxy-${COMPOSE_PROJECT_NAME}.tls=true
       - traefik.http.routers.auth-proxy-${COMPOSE_PROJECT_NAME}.tls.certresolver=letsencrypt
 
       # https://oauth2-proxy.github.io/oauth2-proxy/configuration/integration/#forwardauth-with-static-upstreams-configuration
@@ -82,12 +81,10 @@ services:
       - traefik.http.routers.gateway-coreapi-auth-${COMPOSE_PROJECT_NAME}.rule=Host(`${LEAF_DOMAIN}`) && Path(`/api/user`)
       - traefik.http.routers.gateway-coreapi-auth-${COMPOSE_PROJECT_NAME}.middlewares=oidc-auth-${COMPOSE_PROJECT_NAME},leaf-groups-${COMPOSE_PROJECT_NAME}
       - traefik.http.routers.gateway-coreapi-auth-${COMPOSE_PROJECT_NAME}.entrypoints=websecure
-      - traefik.http.routers.gateway-coreapi-auth-${COMPOSE_PROJECT_NAME}.tls=true
       - traefik.http.routers.gateway-coreapi-auth-${COMPOSE_PROJECT_NAME}.tls.certresolver=letsencrypt
 
       - traefik.http.routers.gateway-coreapi-unauth-${COMPOSE_PROJECT_NAME}.rule=Host(`${LEAF_DOMAIN}`) && PathPrefix(`/api`) && !Path(`/api/user`)
       - traefik.http.routers.gateway-coreapi-unauth-${COMPOSE_PROJECT_NAME}.entrypoints=websecure
-      - traefik.http.routers.gateway-coreapi-unauth-${COMPOSE_PROJECT_NAME}.tls=true
       - traefik.http.routers.gateway-coreapi-unauth-${COMPOSE_PROJECT_NAME}.tls.certresolver=letsencrypt
 
   node:
@@ -99,7 +96,6 @@ services:
       - traefik.http.routers.gateway-node-${COMPOSE_PROJECT_NAME}.rule=Host(`${LEAF_DOMAIN}`) && !PathPrefix(`/api`)
       - traefik.http.routers.gateway-node-${COMPOSE_PROJECT_NAME}.middlewares=oidc-auth-${COMPOSE_PROJECT_NAME}
       - traefik.http.routers.gateway-node-${COMPOSE_PROJECT_NAME}.entrypoints=websecure
-      - traefik.http.routers.gateway-node-${COMPOSE_PROJECT_NAME}.tls=true
       - traefik.http.routers.gateway-node-${COMPOSE_PROJECT_NAME}.tls.certresolver=letsencrypt
 
   clin-db:

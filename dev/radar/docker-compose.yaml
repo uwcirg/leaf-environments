@@ -23,12 +23,10 @@ services:
       - traefik.http.routers.radar-coreapi-auth-${COMPOSE_PROJECT_NAME}.rule=Host(`radar.${LEAF_DOMAIN}`) && Path(`/api/user`)
       - traefik.http.routers.radar-coreapi-auth-${COMPOSE_PROJECT_NAME}.middlewares=oidc-auth-${COMPOSE_PROJECT_NAME},leaf-groups-${COMPOSE_PROJECT_NAME}
       - traefik.http.routers.radar-coreapi-auth-${COMPOSE_PROJECT_NAME}.entrypoints=websecure
-      - traefik.http.routers.radar-coreapi-auth-${COMPOSE_PROJECT_NAME}.tls=true
       - traefik.http.routers.radar-coreapi-auth-${COMPOSE_PROJECT_NAME}.tls.certresolver=letsencrypt
 
       - traefik.http.routers.radar-coreapi-unauth-${COMPOSE_PROJECT_NAME}.rule=Host(`radar.${LEAF_DOMAIN}`) && PathPrefix(`/api`) && !Path(`/api/user`)
       - traefik.http.routers.radar-coreapi-unauth-${COMPOSE_PROJECT_NAME}.entrypoints=websecure
-      - traefik.http.routers.radar-coreapi-unauth-${COMPOSE_PROJECT_NAME}.tls=true
       - traefik.http.routers.radar-coreapi-unauth-${COMPOSE_PROJECT_NAME}.tls.certresolver=letsencrypt
 
   node:
@@ -37,7 +35,6 @@ services:
       - traefik.http.routers.radar-node-${COMPOSE_PROJECT_NAME}.rule=Host(`radar.${LEAF_DOMAIN}`) && !PathPrefix(`/api`)
       - traefik.http.routers.radar-node-${COMPOSE_PROJECT_NAME}.middlewares=oidc-auth-${COMPOSE_PROJECT_NAME}
       - traefik.http.routers.radar-node-${COMPOSE_PROJECT_NAME}.entrypoints=websecure
-      - traefik.http.routers.radar-node-${COMPOSE_PROJECT_NAME}.tls=true
       - traefik.http.routers.radar-node-${COMPOSE_PROJECT_NAME}.tls.certresolver=letsencrypt
 volumes:
   leaf-radar-mssql:
