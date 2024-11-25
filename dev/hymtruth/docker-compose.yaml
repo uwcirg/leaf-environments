@@ -19,14 +19,21 @@ services:
       LEAF_APP_DB: Server=hymtruth-mssql,1433;Database=LeafDB;uid=sa;Password=${MSSQL_SA_PASSWORD}
       LEAF_CLIN_DB: Server=clin-db,3306;Database=hymtruth;uid=db-user;Password=${MYSQL_PASSWORD};Pooling=false
     labels:
-      - traefik.http.routers.hymtruth-coreapi-${COMPOSE_PROJECT_NAME}.rule=Host(`hymtruth.${LEAF_DOMAIN}`) && PathPrefix(`/api`)
-      - traefik.http.routers.hymtruth-coreapi-${COMPOSE_PROJECT_NAME}.entrypoints=websecure
-      - traefik.http.routers.hymtruth-coreapi-${COMPOSE_PROJECT_NAME}.tls.certresolver=letsencrypt
+      # https://leafdocs.rit.uw.edu/installation/installation_steps/9_saml2/#route-protection-setup
+      - traefik.http.routers.hymtruth-coreapi-auth-${COMPOSE_PROJECT_NAME}.rule=Host(`hymtruth.${LEAF_DOMAIN}`) && Path(`/api/user`)
+      - traefik.http.routers.hymtruth-coreapi-auth-${COMPOSE_PROJECT_NAME}.middlewares=oidc-auth-${COMPOSE_PROJECT_NAME}
+      - traefik.http.routers.hymtruth-coreapi-auth-${COMPOSE_PROJECT_NAME}.entrypoints=websecure
+      - traefik.http.routers.hymtruth-coreapi-auth-${COMPOSE_PROJECT_NAME}.tls.certresolver=letsencrypt
+
+      - traefik.http.routers.hymtruth-coreapi-unauth-${COMPOSE_PROJECT_NAME}.rule=Host(`hymtruth.${LEAF_DOMAIN}`) && PathPrefix(`/api`) && !Path(`/api/user`)
+      - traefik.http.routers.hymtruth-coreapi-unauth-${COMPOSE_PROJECT_NAME}.entrypoints=websecure
+      - traefik.http.routers.hymtruth-coreapi-unauth-${COMPOSE_PROJECT_NAME}.tls.certresolver=letsencrypt
 
   node:
     labels:
       - traefik.enable=true
-      - traefik.http.routers.hymtruth-node-${COMPOSE_PROJECT_NAME}.rule=Host(`hymtruth.${LEAF_DOMAIN}`)
+      - traefik.http.routers.hymtruth-node-${COMPOSE_PROJECT_NAME}.rule=Host(`hymtruth.${LEAF_DOMAIN}`) && !PathPrefix(`/api`)
+      - traefik.http.routers.hymtruth-node-${COMPOSE_PROJECT_NAME}.middlewares=oidc-auth-${COMPOSE_PROJECT_NAME}
       - traefik.http.routers.hymtruth-node-${COMPOSE_PROJECT_NAME}.entrypoints=websecure
       - traefik.http.routers.hymtruth-node-${COMPOSE_PROJECT_NAME}.tls.certresolver=letsencrypt
 

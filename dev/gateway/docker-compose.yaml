@@ -1,5 +1,58 @@
 version: "3"
 services:
+  auth-proxy:
+    image: quay.io/oauth2-proxy/oauth2-proxy:v7.3.0
+    # oauth2-proxy does not EXPOSE (advertise) the ports it listens on in its docker image
+    expose:
+      - 4180
+    environment:
+      OAUTH2_PROXY_HTTP_ADDRESS: 0.0.0.0:4180
+      OAUTH2_PROXY_REVERSE_PROXY: "true"
+
+      # when authenticated, return a static 202 response
+      # https://oauth2-proxy.github.io/oauth2-proxy/docs/configuration/overview/#forwardauth-with-static-upstreams-configuration
+      OAUTH2_PROXY_UPSTREAMS: static://202
+
+      # needed to set X-Auth-Request-Email
+      OAUTH2_PROXY_SET_XAUTHREQUEST: "true"
+
+      # general cookie settings
+      OAUTH2_PROXY_COOKIE_SECRET: ${OAUTH2_PROXY_COOKIE_SECRET}
+      OAUTH2_PROXY_COOKIE_DOMAINS: .${LEAF_DOMAIN}
+      OAUTH2_PROXY_WHITELIST_DOMAINS: .${LEAF_DOMAIN}
+      OAUTH2_PROXY_COOKIE_EXPIRE: 30m
+      OAUTH2_PROXY_COOKIE_REFRESH: 1m
+      OAUTH2_PROXY_EMAIL_DOMAINS: "*"
+      OAUTH2_PROXY_INSECURE_OIDC_ALLOW_UNVERIFIED_EMAIL: "true"
+      # TODO test how leaf handles usernames that are not email addresses
+      # base session cookie on Keycloak username (email not always set in Keycloak)
+      OAUTH2_PROXY_USER_ID_CLAIM: preferred_username
+
+      # OIDC integration settings
+      OAUTH2_PROXY_PROVIDER: oidc
+      OAUTH2_PROXY_SCOPE: openid profile email
+      OAUTH2_PROXY_OIDC_ISSUER_URL: ${OAUTH2_PROXY_OIDC_ISSUER_URL}
+      OAUTH2_PROXY_CLIENT_ID: ${OAUTH2_PROXY_CLIENT_ID}
+      OAUTH2_PROXY_CLIENT_SECRET: ${OAUTH2_PROXY_CLIENT_SECRET}
+    labels:
+      - traefik.enable=true
+      # TODO fix HostRegexp syntax, after upgrading to traefik v3
+      - traefik.http.routers.auth-proxy-${COMPOSE_PROJECT_NAME}.rule=Host(`auth-proxy.${LEAF_DOMAIN}`) || (PathPrefix(`/oauth2`) && (Host(`${LEAF_DOMAIN}`) || HostRegexp(`{subdomain:.+}.${LEAF_DOMAIN}`)))
+
+      - traefik.http.routers.auth-proxy-${COMPOSE_PROJECT_NAME}.entrypoints=websecure
+      - traefik.http.routers.auth-proxy-${COMPOSE_PROJECT_NAME}.tls.certresolver=letsencrypt
+
+      # https://oauth2-proxy.github.io/oauth2-proxy/configuration/integration/#forwardauth-with-static-upstreams-configuration
+      - traefik.http.middlewares.oidc-auth-${COMPOSE_PROJECT_NAME}.forwardAuth.address=http://auth-proxy-${COMPOSE_PROJECT_NAME}:4180/
+      - traefik.http.middlewares.oidc-auth-${COMPOSE_PROJECT_NAME}.forwardAuth.trustForwardHeader=true
+      - traefik.http.middlewares.oidc-auth-${COMPOSE_PROJECT_NAME}.forwardAuth.authResponseHeaders=X-Auth-Request-User,X-Auth-Request-Email,X-Auth-Request-Access-Token,Authorization
+
+    networks:
+      ingress:
+        aliases:
+          - auth-proxy-${COMPOSE_PROJECT_NAME}
+      internal:
+
   gateway-mssql:
     extends:
       file: ../common-services.yaml
@@ -19,9 +72,15 @@ services:
       LEAF_APP_DB: Server=gateway-mssql,1433;Database=LeafDB;uid=sa;Password=${MSSQL_SA_PASSWORD}
       LEAF_CLIN_DB: Server=clin-db,3306;Database=gateway;uid=db-user;Password=${MYSQL_PASSWORD};Pooling=false
     labels:
-      - traefik.http.routers.gateway-coreapi-${COMPOSE_PROJECT_NAME}.rule=Host(`${LEAF_DOMAIN}`) && PathPrefix(`/api`)
-      - traefik.http.routers.gateway-coreapi-${COMPOSE_PROJECT_NAME}.entrypoints=websecure
-      - traefik.http.routers.gateway-coreapi-${COMPOSE_PROJECT_NAME}.tls.certresolver=letsencrypt
+      # https://leafdocs.rit.uw.edu/installation/installation_steps/9_saml2/#route-protection-setup
+      - traefik.http.routers.gateway-coreapi-auth-${COMPOSE_PROJECT_NAME}.rule=Host(`${LEAF_DOMAIN}`) && Path(`/api/user`)
+      - traefik.http.routers.gateway-coreapi-auth-${COMPOSE_PROJECT_NAME}.middlewares=oidc-auth-${COMPOSE_PROJECT_NAME}
+      - traefik.http.routers.gateway-coreapi-auth-${COMPOSE_PROJECT_NAME}.entrypoints=websecure
+      - traefik.http.routers.gateway-coreapi-auth-${COMPOSE_PROJECT_NAME}.tls.certresolver=letsencrypt
+
+      - traefik.http.routers.gateway-coreapi-unauth-${COMPOSE_PROJECT_NAME}.rule=Host(`${LEAF_DOMAIN}`) && PathPrefix(`/api`) && !Path(`/api/user`)
+      - traefik.http.routers.gateway-coreapi-unauth-${COMPOSE_PROJECT_NAME}.entrypoints=websecure
+      - traefik.http.routers.gateway-coreapi-unauth-${COMPOSE_PROJECT_NAME}.tls.certresolver=letsencrypt
 
   node:
     extends:
@@ -29,7 +88,8 @@ services:
       service: node
     labels:
       - traefik.enable=true
-      - traefik.http.routers.gateway-node-${COMPOSE_PROJECT_NAME}.rule=Host(`${LEAF_DOMAIN}`)
+      - traefik.http.routers.gateway-node-${COMPOSE_PROJECT_NAME}.rule=Host(`${LEAF_DOMAIN}`) && !PathPrefix(`/api`)
+      - traefik.http.routers.gateway-node-${COMPOSE_PROJECT_NAME}.middlewares=oidc-auth-${COMPOSE_PROJECT_NAME}
       - traefik.http.routers.gateway-node-${COMPOSE_PROJECT_NAME}.entrypoints=websecure
       - traefik.http.routers.gateway-node-${COMPOSE_PROJECT_NAME}.tls.certresolver=letsencrypt
 
