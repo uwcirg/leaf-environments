@@ -21,7 +21,6 @@ services:
     labels:
       - traefik.http.routers.hymtruth-coreapi-${COMPOSE_PROJECT_NAME}.rule=Host(`hymtruth.${LEAF_DOMAIN}`) && PathPrefix(`/api`)
       - traefik.http.routers.hymtruth-coreapi-${COMPOSE_PROJECT_NAME}.entrypoints=websecure
-      - traefik.http.routers.hymtruth-coreapi-${COMPOSE_PROJECT_NAME}.tls=true
       - traefik.http.routers.hymtruth-coreapi-${COMPOSE_PROJECT_NAME}.tls.certresolver=letsencrypt
 
       # TODO remove after auth implemented via oauth2-proxy
@@ -32,7 +31,6 @@ services:
       - traefik.enable=true
       - traefik.http.routers.hymtruth-node-${COMPOSE_PROJECT_NAME}.rule=Host(`hymtruth.${LEAF_DOMAIN}`)
       - traefik.http.routers.hymtruth-node-${COMPOSE_PROJECT_NAME}.entrypoints=websecure
-      - traefik.http.routers.hymtruth-node-${COMPOSE_PROJECT_NAME}.tls=true
       - traefik.http.routers.hymtruth-node-${COMPOSE_PROJECT_NAME}.tls.certresolver=letsencrypt
 
       # TODO remove after auth implemented via oauth2-proxy

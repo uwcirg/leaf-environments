@@ -21,7 +21,6 @@ services:
     labels:
       - traefik.http.routers.gateway-coreapi-${COMPOSE_PROJECT_NAME}.rule=Host(`${LEAF_DOMAIN}`) && PathPrefix(`/api`)
       - traefik.http.routers.gateway-coreapi-${COMPOSE_PROJECT_NAME}.entrypoints=websecure
-      - traefik.http.routers.gateway-coreapi-${COMPOSE_PROJECT_NAME}.tls=true
       - traefik.http.routers.gateway-coreapi-${COMPOSE_PROJECT_NAME}.tls.certresolver=letsencrypt
 
       # TODO remove after auth implemented via oauth2-proxy
@@ -35,7 +34,6 @@ services:
       - traefik.enable=true
       - traefik.http.routers.gateway-node-${COMPOSE_PROJECT_NAME}.rule=Host(`${LEAF_DOMAIN}`)
       - traefik.http.routers.gateway-node-${COMPOSE_PROJECT_NAME}.entrypoints=websecure
-      - traefik.http.routers.gateway-node-${COMPOSE_PROJECT_NAME}.tls=true
       - traefik.http.routers.gateway-node-${COMPOSE_PROJECT_NAME}.tls.certresolver=letsencrypt
 
       # TODO remove after auth implemented via oauth2-proxy
