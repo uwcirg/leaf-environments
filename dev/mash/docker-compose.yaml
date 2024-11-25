@@ -19,14 +19,21 @@ services:
       LEAF_APP_DB: Server=mash-mssql,1433;Database=LeafDB;uid=sa;Password=${MSSQL_SA_PASSWORD}
       LEAF_CLIN_DB: Server=clin-db,3306;Database=mash;uid=db-user;Password=${MYSQL_PASSWORD};Pooling=false
     labels:
-      - traefik.http.routers.mash-coreapi-${COMPOSE_PROJECT_NAME}.rule=Host(`mash.${LEAF_DOMAIN}`) && PathPrefix(`/api`)
-      - traefik.http.routers.mash-coreapi-${COMPOSE_PROJECT_NAME}.entrypoints=websecure
-      - traefik.http.routers.mash-coreapi-${COMPOSE_PROJECT_NAME}.tls.certresolver=letsencrypt
+      # https://leafdocs.rit.uw.edu/installation/installation_steps/9_saml2/#route-protection-setup
+      - traefik.http.routers.mash-coreapi-auth-${COMPOSE_PROJECT_NAME}.rule=Host(`mash.${LEAF_DOMAIN}`) && Path(`/api/user`)
+      - traefik.http.routers.mash-coreapi-auth-${COMPOSE_PROJECT_NAME}.middlewares=oidc-auth-${COMPOSE_PROJECT_NAME}
+      - traefik.http.routers.mash-coreapi-auth-${COMPOSE_PROJECT_NAME}.entrypoints=websecure
+      - traefik.http.routers.mash-coreapi-auth-${COMPOSE_PROJECT_NAME}.tls.certresolver=letsencrypt
+
+      - traefik.http.routers.mash-coreapi-unauth-${COMPOSE_PROJECT_NAME}.rule=Host(`mash.${LEAF_DOMAIN}`) && PathPrefix(`/api`) && !Path(`/api/user`)
+      - traefik.http.routers.mash-coreapi-unauth-${COMPOSE_PROJECT_NAME}.entrypoints=websecure
+      - traefik.http.routers.mash-coreapi-unauth-${COMPOSE_PROJECT_NAME}.tls.certresolver=letsencrypt
 
   node:
     labels:
       - traefik.enable=true
-      - traefik.http.routers.mash-node-${COMPOSE_PROJECT_NAME}.rule=Host(`mash.${LEAF_DOMAIN}`)
+      - traefik.http.routers.mash-node-${COMPOSE_PROJECT_NAME}.rule=Host(`mash.${LEAF_DOMAIN}`) && !PathPrefix(`/api`)
+      - traefik.http.routers.mash-node-${COMPOSE_PROJECT_NAME}.middlewares=oidc-auth-${COMPOSE_PROJECT_NAME}
       - traefik.http.routers.mash-node-${COMPOSE_PROJECT_NAME}.entrypoints=websecure
       - traefik.http.routers.mash-node-${COMPOSE_PROJECT_NAME}.tls.certresolver=letsencrypt
 

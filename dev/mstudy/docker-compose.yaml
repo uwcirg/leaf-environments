@@ -19,14 +19,21 @@ services:
       LEAF_APP_DB: Server=mstudy-mssql,1433;Database=LeafDB;uid=sa;Password=${MSSQL_SA_PASSWORD}
       LEAF_CLIN_DB: Server=clin-db,3306;Database=mstudy;uid=db-user;Password=${MYSQL_PASSWORD};Pooling=false
     labels:
-      - traefik.http.routers.mstudy-coreapi-${COMPOSE_PROJECT_NAME}.rule=Host(`mstudy.${LEAF_DOMAIN}`) && PathPrefix(`/api`)
-      - traefik.http.routers.mstudy-coreapi-${COMPOSE_PROJECT_NAME}.entrypoints=websecure
-      - traefik.http.routers.mstudy-coreapi-${COMPOSE_PROJECT_NAME}.tls.certresolver=letsencrypt
+      # https://leafdocs.rit.uw.edu/installation/installation_steps/9_saml2/#route-protection-setup
+      - traefik.http.routers.mstudy-coreapi-auth-${COMPOSE_PROJECT_NAME}.rule=Host(`mstudy.${LEAF_DOMAIN}`) && Path(`/api/user`)
+      - traefik.http.routers.mstudy-coreapi-auth-${COMPOSE_PROJECT_NAME}.middlewares=oidc-auth-${COMPOSE_PROJECT_NAME}
+      - traefik.http.routers.mstudy-coreapi-auth-${COMPOSE_PROJECT_NAME}.entrypoints=websecure
+      - traefik.http.routers.mstudy-coreapi-auth-${COMPOSE_PROJECT_NAME}.tls.certresolver=letsencrypt
+
+      - traefik.http.routers.mstudy-coreapi-unauth-${COMPOSE_PROJECT_NAME}.rule=Host(`mstudy.${LEAF_DOMAIN}`) && PathPrefix(`/api`) && !Path(`/api/user`)
+      - traefik.http.routers.mstudy-coreapi-unauth-${COMPOSE_PROJECT_NAME}.entrypoints=websecure
+      - traefik.http.routers.mstudy-coreapi-unauth-${COMPOSE_PROJECT_NAME}.tls.certresolver=letsencrypt
 
   node:
     labels:
       - traefik.enable=true
-      - traefik.http.routers.mstudy-node-${COMPOSE_PROJECT_NAME}.rule=Host(`mstudy.${LEAF_DOMAIN}`)
+      - traefik.http.routers.mstudy-node-${COMPOSE_PROJECT_NAME}.rule=Host(`mstudy.${LEAF_DOMAIN}`) && !PathPrefix(`/api`)
+      - traefik.http.routers.mstudy-node-${COMPOSE_PROJECT_NAME}.middlewares=oidc-auth-${COMPOSE_PROJECT_NAME}
       - traefik.http.routers.mstudy-node-${COMPOSE_PROJECT_NAME}.entrypoints=websecure
       - traefik.http.routers.mstudy-node-${COMPOSE_PROJECT_NAME}.tls.certresolver=letsencrypt
 
