@@ -47,6 +47,10 @@ services:
       - traefik.http.middlewares.oidc-auth-${COMPOSE_PROJECT_NAME}.forwardAuth.trustForwardHeader=true
       - traefik.http.middlewares.oidc-auth-${COMPOSE_PROJECT_NAME}.forwardAuth.authResponseHeaders=X-Auth-Request-User,X-Auth-Request-Email,X-Auth-Request-Access-Token,Authorization
 
+      # TODO dynamically look up from OIDC tokens
+      # add Leaf group to all users via HTTP request header; see appsettings.json for available roles
+      - traefik.http.middlewares.leaf-groups-${COMPOSE_PROJECT_NAME}.headers.customrequestheaders.gws-groups=leaf_users;leaf_phi;leaf_admin
+
     networks:
       ingress:
         aliases:
@@ -74,7 +78,7 @@ services:
     labels:
       # https://leafdocs.rit.uw.edu/installation/installation_steps/9_saml2/#route-protection-setup
       - traefik.http.routers.gateway-coreapi-auth-${COMPOSE_PROJECT_NAME}.rule=Host(`${LEAF_DOMAIN}`) && Path(`/api/user`)
-      - traefik.http.routers.gateway-coreapi-auth-${COMPOSE_PROJECT_NAME}.middlewares=oidc-auth-${COMPOSE_PROJECT_NAME}
+      - traefik.http.routers.gateway-coreapi-auth-${COMPOSE_PROJECT_NAME}.middlewares=oidc-auth-${COMPOSE_PROJECT_NAME},leaf-groups-${COMPOSE_PROJECT_NAME}
       - traefik.http.routers.gateway-coreapi-auth-${COMPOSE_PROJECT_NAME}.entrypoints=websecure
       - traefik.http.routers.gateway-coreapi-auth-${COMPOSE_PROJECT_NAME}.tls.certresolver=letsencrypt
 
