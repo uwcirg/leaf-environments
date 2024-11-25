@@ -21,7 +21,7 @@ services:
     labels:
       # https://leafdocs.rit.uw.edu/installation/installation_steps/9_saml2/#route-protection-setup
       - traefik.http.routers.alive-coreapi-auth-${COMPOSE_PROJECT_NAME}.rule=Host(`alive.${LEAF_DOMAIN}`) && Path(`/api/user`)
-      - traefik.http.routers.alive-coreapi-auth-${COMPOSE_PROJECT_NAME}.middlewares=oidc-auth-${COMPOSE_PROJECT_NAME}
+      - traefik.http.routers.alive-coreapi-auth-${COMPOSE_PROJECT_NAME}.middlewares=oidc-auth-${COMPOSE_PROJECT_NAME},leaf-groups-${COMPOSE_PROJECT_NAME}
       - traefik.http.routers.alive-coreapi-auth-${COMPOSE_PROJECT_NAME}.entrypoints=websecure
       - traefik.http.routers.alive-coreapi-auth-${COMPOSE_PROJECT_NAME}.tls.certresolver=letsencrypt
 
