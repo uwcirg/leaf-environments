@@ -23,7 +23,7 @@ For each site, generate a JWT signing key. Follow Leaf instructions for [3 - Cre
     openssl req -nodes -x509 -newkey rsa:2048 -days 3650 \
         -keyout ${LEAF_CHECKOUT_PATH}/dev/${SITE}/keys/key.pem \
         -out ${LEAF_CHECKOUT_PATH}/dev/${SITE}/keys/cert.pem \
-        -subj "/CN=urn:leaf:issuer:leaf.${INSTITUTION:-cirg}.${TLD:-uw.edu}"
+        -subj "/CN=urn:leaf:issuer:${SITE}.leaf.${INSTITUTION:-cirg}.${TLD:-uw.edu}"
 
     # load docker compose environment variables into current shell
     source .env
