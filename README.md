@@ -2,7 +2,7 @@
 Configuration for Leaf sites
 
 ## Setup
-Clone this repo to your desired location, including the --recurse-submodules argument to initialize all git submodules
+Clone this repo to your desired location, including the `--recurse-submodules` argument to initialize all git submodules
 
     LEAF_CHECKOUT_PATH=$HOME/leaf-environments
     git clone --recurse-submodules https://github.com/uwcirg/leaf-environments $LEAF_CHECKOUT_PATH
