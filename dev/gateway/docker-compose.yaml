@@ -49,7 +49,7 @@ services:
 
       # TODO dynamically look up from OIDC tokens
       # add Leaf group to all users via HTTP request header; see appsettings.json for available roles
-      - traefik.http.middlewares.leaf-groups-${COMPOSE_PROJECT_NAME}.headers.customrequestheaders.gws-groups=leaf_users;leaf_phi;leaf_admin
+      - traefik.http.middlewares.leaf-groups-${COMPOSE_PROJECT_NAME}.headers.customrequestheaders.gws-groups=leaf_users
 
     networks:
       ingress:
