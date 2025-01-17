@@ -2,7 +2,7 @@
 Configuration for Leaf sites
 
 ## Setup
-Clone this repo to your desired location, including the --recurse-submodules argument to initialize all git submodules
+Clone this repo to your desired location, including the `--recurse-submodules` argument to initialize all git submodules
 
     LEAF_CHECKOUT_PATH=$HOME/leaf-environments
     git clone --recurse-submodules https://github.com/uwcirg/leaf-environments $LEAF_CHECKOUT_PATH
@@ -23,7 +23,7 @@ For each site, generate a JWT signing key. Follow Leaf instructions for [3 - Cre
     openssl req -nodes -x509 -newkey rsa:2048 -days 3650 \
         -keyout ${LEAF_CHECKOUT_PATH}/dev/${SITE}/keys/key.pem \
         -out ${LEAF_CHECKOUT_PATH}/dev/${SITE}/keys/cert.pem \
-        -subj "/CN=urn:leaf:issuer:leaf.${INSTITUTION:-cirg}.${TLD:-uw.edu}"
+        -subj "/CN=urn:leaf:issuer:${SITE}.leaf.${INSTITUTION:-cirg}.${TLD:-uw.edu}"
 
     # load docker compose environment variables into current shell
     source .env
@@ -51,7 +51,7 @@ After 10+ minutes, Leaf should be available at `https://${LEAF_DOMAIN}`, or `htt
 To load a site-specific dataset into its corresponding database, invoke mysql as follows (manually replacing ${SITE} with the desired site)
 
     sql_file_path=/srv/www/leaf-scripts/cnics_data.phosphorus.2024.03.14.19.07.reduced.sql
-    docker compose exec -T clin-db bash -c 'mysql --user=${MYSQL_USER} --password=${MYSQL_PASSWORD} ${SITE}' < $sql_file_path
+    docker compose exec -T clin-db bash -c 'mysql --user=root --password=${MYSQL_ROOT_PASSWORD} ${SITE}' < $sql_file_path
 
 ## Troubleshooting Federated Instances
 If trusted instances do not appear to be available for queries, and investigating the GET requests sent out by the gateway instance suggests calls to `/api/network/identity` on other instances are failing with a 401 error, then the following steps may be required to re-establish a working trust between instances.
