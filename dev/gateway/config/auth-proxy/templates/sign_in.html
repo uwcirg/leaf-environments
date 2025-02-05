@@ -23,6 +23,13 @@
       body {
         height: 100vh;
       }
+      body {
+        display: flex;
+        flex-direction: column;
+      }
+      section.main {
+        flex: 2;
+      }
       .title {
         font-size: 2.4rem;
         margin-bottom: 8px;
@@ -93,7 +100,7 @@
   </head>
   <body class="has-background-light">
     <section id="sideBar">HIV SUCCESS data query tool</section>
-    <section class="section has-background-light">
+    <section class="main section has-background-light">
       <div class="box block sign-in-box has-text-centered">
         {{ if .LogoData }}
         <div class="block logo-box">{{.LogoData}}</div>
