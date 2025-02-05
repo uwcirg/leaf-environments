@@ -2,21 +2,96 @@
 <!DOCTYPE html>
 <html lang="en" charset="utf-8">
   <head>
-    <meta charset="utf-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
-    <title>Sign In</title>
-    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bulma@0.9.1/css/bulma.min.css">
+    <meta charset="utf-8" />
+    <meta
+      name="viewport"
+      content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no"
+    />
+    <title>Sign In HIV SUCCESS data query tool</title>
+    <link
+      rel="stylesheet"
+      href="https://cdn.jsdelivr.net/npm/bulma@0.9.1/css/bulma.min.css"
+    />
 
     <style>
+      :root {
+        --primary-color: #0057ff;
+        --primary-dark-color: #003bac;
+        --secondary-color: #009959;
+      }
+      html,
       body {
         height: 100vh;
       }
+      body {
+        display: flex;
+        flex-direction: column;
+      }
+      section.main {
+        flex: 2;
+      }
+      .title {
+        font-size: 2.4rem;
+        margin-bottom: 8px;
+      }
+      button {
+        border-radius: 50vwh;
+        text-transform: uppercase;
+      }
+      button.is-primary {
+        background-color: var(--primary-dark-color) !important;
+        font-size: 1.2rem;
+        border-radius: 12px;
+        max-width: 100%;
+        word-break: break-word;
+        white-space: normal;
+        line-height: 1.2;
+      }
+      .logo-box img {
+        width: 26%;
+        display: block;
+        margin: auto;
+        min-width: 240px;
+      }
+      #sideBar {
+        background: linear-gradient(
+          120deg,
+          var(--primary-dark-color) 4.69%,
+          var(--primary-color) 40.63%,
+          var(--secondary-color) 95.31%
+        );
+        color: #fff;
+        cursor: default;
+        position: fixed;
+        top: 0;
+        overflow-x: hidden;
+        overflow-y: auto;
+        text-align: right;
+        z-index: 10000;
+        width: 100%;
+        height: 48px;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        text-transform: uppercase;
+        font-weight: 400;
+      }
       .sign-in-box {
-        max-width: 400px;
-        margin: 1.25rem auto;
+        max-width: 80%;
+        margin: 1rem auto;
+        text-align: left;
+      }
+      .sign-in-box p:not(:last-of-type) {
+        margin-bottom: 8px;
       }
       .logo-box {
-        margin: 1.5rem 3rem;
+        margin: 1.2rem 3rem;
+      }
+      .button-container {
+        margin-top: 8px;
+      }
+      footer {
+        padding: 8px !important;
       }
       footer a {
         text-decoration: underline;
@@ -24,75 +99,125 @@
     </style>
   </head>
   <body class="has-background-light">
-  <section class="section">
-    <div class="box block sign-in-box has-text-centered">
-      {{ if .LogoData }}
-      <div class="block logo-box">
-        {{.LogoData}}
+    <section id="sideBar">HIV SUCCESS data query tool</section>
+    <section class="main section has-background-light">
+      <div class="box block sign-in-box has-text-centered">
+        {{ if .LogoData }}
+        <div class="block logo-box">{{.LogoData}}</div>
+        {{ end }}
+
+        <form method="GET" action="{{.ProxyPrefix}}/start">
+          <input type="hidden" name="rd" value="{{.Redirect}}" />
+          <h1 class="title has-text-centered">
+            Welcome to the HIV SUCCESS data query tool
+          </h1>
+          <p>
+            HIV SUCCESS is the consortium of NIDA substance use and HIV cohorts.
+            Data across all cohorts is harmonized and available for use by
+            others for cross cohort analyses to support research and
+            organizations for planning and understanding the HIV and substance
+            use syndemics.
+          </p>
+          <p>
+            This data query tool allows prospective data users to determine if
+            data of interest might be available for future analyses. For the
+            protection of participants, only aggregated data are shown for
+            groups of 10 or more people. For further access to data, please
+            complete and submit an HIV SUCCESS concept proposal for review.
+            (Form can be found
+            <a href="https://hivsuccess.uw.edu/data.html" target="_blank"
+              >here</a
+            >.)
+          </p>
+          <p>
+            All users are asked to login using their Google or UW Net ID
+            accounts or register through our system,. We collect details on
+            names and emails to help with password support and organization/
+            institution to understand who views our data. All information are
+            held securely and confidentially. User information is not shared
+            outside of HIV SUCCESS with the exception of aggregated information
+            on what types of organizations and geographic regions view the data.
+          </p>
+          <br />
+          <div class="has-text-centered button-container">
+            <button type="submit" class="button block is-primary">
+              Sign in to HIV SUCCESS data query tool
+            </button>
+          </div>
+          <br />
+        </form>
+
+        {{ if .CustomLogin }}
+        <hr />
+
+        <form method="POST" action="{{.ProxyPrefix}}/sign_in" class="block">
+          <input type="hidden" name="rd" value="{{.Redirect}}" />
+
+          <div class="field">
+            <label class="label" for="username">Username</label>
+            <div class="control">
+              <input
+                class="input"
+                type="text"
+                placeholder="e.g. userx@example.com"
+                name="username"
+                id="username"
+              />
+            </div>
+          </div>
+
+          <div class="field">
+            <label class="label" for="password">Password</label>
+            <div class="control">
+              <input
+                class="input"
+                type="password"
+                placeholder="********"
+                name="password"
+                id="password"
+              />
+            </div>
+          </div>
+          <button class="button is-primary">Sign in</button>
+        </form>
+        {{ end }}
       </div>
-      {{ end }}
+    </section>
 
-      <form method="GET" action="{{.ProxyPrefix}}/start">
-        <input type="hidden" name="rd" value="{{.Redirect}}">
-          {{ if .SignInMessage }}
-          <p class="block">{{.SignInMessage}}</p>
-          {{ end}}
-          <button type="submit" class="button block is-primary">Sign in with {{.ProviderName}}</button>
-      </form>
-
-      {{ if .CustomLogin }}
-      <hr>
-
-      <form method="POST" action="{{.ProxyPrefix}}/sign_in" class="block">
-        <input type="hidden" name="rd" value="{{.Redirect}}">
-
-        <div class="field">
-          <label class="label" for="username">Username</label>
-          <div class="control">
-            <input class="input" type="text" placeholder="e.g. userx@example.com"  name="username" id="username">
-          </div>
-        </div>
-
-        <div class="field">
-          <label class="label" for="password">Password</label>
-          <div class="control">
-            <input class="input" type="password" placeholder="********" name="password" id="password">
-          </div>
-        </div>
-        <button class="button is-primary">Sign in</button>
-      </form>
-      {{ end }}
-    </div>
-  </section>
-
-  <script>
-    if (window.location.hash) {
-      (function() {
-        var inputs = document.getElementsByName('rd');
-        for (var i = 0; i < inputs.length; i++) {
-          // Add hash, but make sure it is only added once
-          var idx = inputs[i].value.indexOf('#');
-          if (idx >= 0) {
-            // Remove existing hash from URL
-            inputs[i].value = inputs[i].value.substr(0, idx);
+    <script>
+      if (window.location.hash) {
+        (function () {
+          var inputs = document.getElementsByName("rd");
+          for (var i = 0; i < inputs.length; i++) {
+            // Add hash, but make sure it is only added once
+            var idx = inputs[i].value.indexOf("#");
+            if (idx >= 0) {
+              // Remove existing hash from URL
+              inputs[i].value = inputs[i].value.substr(0, idx);
+            }
+            inputs[i].value += window.location.hash;
           }
-          inputs[i].value += window.location.hash;
-        }
-      })();
-    }
-  </script>
+        })();
+      }
+    </script>
 
-  <footer class="footer has-text-grey has-background-light is-size-7">
-    <div class="content has-text-centered">
-	{{ if eq .Footer "-" }}
-	{{ else if eq .Footer ""}}
-	<p>Secured with <a href="https://github.com/oauth2-proxy/oauth2-proxy#oauth2_proxy" class="has-text-grey">OAuth2 Proxy</a> version {{.Version}}</p>
-	{{ else }}
-	<p>{{.Footer}}</p>
-	{{ end }}
-    </div>
-	</footer>
-
+    <footer class="footer has-text-grey has-background-light is-size-7">
+      <div class="content has-text-centered">
+        {{ if eq .Footer "-" }} {{ else if eq .Footer ""}}
+        <p>
+          Secured with
+          <a
+            href="https://github.com/oauth2-proxy/oauth2-proxy#oauth2_proxy"
+            class="has-text-grey"
+            >OAuth2 Proxy</a
+          >
+          version {{.Version}}
+        </p>
+        {{ else }}
+        <p>{{.Footer}}</p>
+        {{ end }}
+      </div>
+    </footer>
   </body>
 </html>
 {{end}}
