@@ -33,6 +33,8 @@ services:
       - internal
 
   coreapi:
+    environment:
+      LEAF_LOGOUT_URI: https://${LEAF_DOMAIN}/oauth2/sign_out
     image: ghcr.io/uwcirg/leaf-api:${LEAF_API_IMAGE_TAG:-latest}
     build:
       context: ../src/leaf/src/server
