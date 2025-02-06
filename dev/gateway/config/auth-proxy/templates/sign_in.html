@@ -7,7 +7,7 @@
       name="viewport"
       content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no"
     />
-    <title>Sign In HIV SUCCESS data query tool</title>
+    <title>Sign In HIV SUCCESS Data Query Tool</title>
     <link
       rel="stylesheet"
       href="https://cdn.jsdelivr.net/npm/bulma@0.9.1/css/bulma.min.css"
@@ -101,7 +101,7 @@
   <body class="has-background-light">
     <section id="sideBar">HIV SUCCESS data query tool</section>
     <section class="main section has-background-light">
-      <div class="box block sign-in-box has-text-centered">
+      <div class="box block sign-in-box">
         {{ if .LogoData }}
         <div class="block logo-box">{{.LogoData}}</div>
         {{ end }}
@@ -109,7 +109,7 @@
         <form method="GET" action="{{.ProxyPrefix}}/start">
           <input type="hidden" name="rd" value="{{.Redirect}}" />
           <h1 class="title has-text-centered">
-            Welcome to the HIV SUCCESS data query tool
+            Welcome to the HIV SUCCESS Data Query Tool
           </h1>
           <p>
             HIV SUCCESS is the consortium of NIDA substance use and HIV cohorts.
@@ -131,7 +131,7 @@
           </p>
           <p>
             All users are asked to login using their Google or UW Net ID
-            accounts or register through our system,. We collect details on
+            accounts or register through our system. We collect details on
             names and emails to help with password support and organization/
             institution to understand who views our data. All information are
             held securely and confidentially. User information is not shared
